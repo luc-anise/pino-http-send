@@ -62,7 +62,7 @@ export function loadArgs(): Args {
     .option('bodyType', {
       alias: 'b',
       type: 'string',
-      choices: ['json', 'ndjson'],
+      choices: ['json', 'ndjson', 'json_array'],
       desc: 'type of body to send',
       group: 'Sending',
       default: 'json',

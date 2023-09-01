@@ -3,13 +3,15 @@ import got, { Method } from 'got';
 import { args } from './args';
 import { logError, logWarn } from './log';
 
-export type BodyType = 'json' | 'ndjson';
+export type BodyType = 'json' | 'ndjson' | 'json_array';
 
 export type Body = {
   body?: string;
-  json?: {
-    logs: unknown;
-  };
+  json?:
+    | {
+        logs: unknown;
+      }
+    | unknown[];
 };
 
 export function createBody(
@@ -23,6 +25,10 @@ export function createBody(
         '',
       ),
     };
+  }
+
+  if (bodyType === 'json_array') {
+    return { body: JSON.stringify(logs) };
   }
 
   // default is json
