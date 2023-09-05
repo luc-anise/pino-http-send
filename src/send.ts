@@ -11,7 +11,8 @@ export type Body = {
     | {
         logs: unknown;
       }
-    | unknown[];
+    | unknown[]
+    | Record<string, unknown>;
 };
 
 export function createBody(
@@ -28,7 +29,11 @@ export function createBody(
   }
 
   if (bodyType === 'json_array') {
-    return { body: JSON.stringify(logs) };
+    return { json: [...logs] };
+  }
+
+  if (bodyType === 'json' && logs.length === 1) {
+    return { json: logs[0] };
   }
 
   // default is json
