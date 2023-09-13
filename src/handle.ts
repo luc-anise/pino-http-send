@@ -1,10 +1,14 @@
 import { TransformCallback } from 'through2';
 
 import { args } from './args';
-import { send } from './send';
+import { send, sendAsync } from './send';
 
 let batch: Record<string, unknown>[] = [];
 let timeoutId: number;
+
+export async function flush(): Promise<void> {
+  await sendAsync([...batch]);
+}
 
 /**
  * Sends the batch and then clears it.

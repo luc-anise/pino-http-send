@@ -88,3 +88,55 @@ export function send(logs: Record<string, unknown>[], numRetries = 0): void {
       setTimeout(() => send(logs, numRetries), interval);
     });
 }
+
+export async function sendAsync(
+  logs: Record<string, unknown>[],
+  numRetries = 0,
+): Promise<void> {
+  const {
+    url,
+    method,
+    username,
+    password,
+    headers = {},
+    bodyType = 'json',
+    retries = 5,
+    interval = 1000,
+    silent = false,
+  } = args;
+
+  const limitHit = numRetries === retries;
+
+  // fire and forget so we don't await or anything
+  await got(url, {
+    method: method as Method,
+    username,
+    password,
+    headers,
+    allowGetBody: true,
+    ...createBody(logs, bodyType as BodyType),
+  })
+    .then()
+    .catch(err => {
+      if (!silent) {
+        logError(err, limitHit ? null : `...retrying in ${interval}ms`);
+      }
+
+      if (limitHit) {
+        if (!silent) {
+          // make sure to stringify to get the whole thing, e.g. don't want
+          // cutoffs on deep objects...
+          logWarn(
+            `max retries hit (${retries}). dropping logs:`,
+            JSON.stringify(logs),
+          );
+        }
+
+        return;
+      }
+
+      numRetries++;
+
+      setTimeout(() => send(logs, numRetries), interval);
+    });
+}

@@ -44,3 +44,5 @@ export function createWriteStream(args: Args): Pumpify {
 
   return new Pumpify(split(safeParse), streamHandler());
 }
+
+export { flush } from './handle';
